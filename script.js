@@ -4,6 +4,14 @@ class Inventario{
     }
     agreR(nuevo,item){
         if(item.siguiente == null){
+            let temp = this.primero;
+            while (temp != null) {
+                if (nuevo.codigo == temp.codigo) {
+                    console.log('falo');
+                    return false;
+                }
+                temp = temp.siguiente;
+            }
             item.siguiente = nuevo;
         }else{
             this.agreR(nuevo, item.siguiente);
@@ -14,10 +22,13 @@ class Inventario{
             this.primero = nuevo;
             this.primero.siguiente = null;
         }else{
+            if (this.agreR(nuevo, this.primero) == false) {
+                return false;
+            }
             this.agreR(nuevo,this.primero)
         }
     }
-    eliminar(codigo){
+        eliminar(codigo){
         if(this.primero == null){
             return false;
         }else if(this.primero.codigo == codigo){
@@ -123,7 +134,8 @@ const posicion = document.getElementById("posicion");
 
 const btnBuscar = document.getElementById("buscar");
 const btnListar = document.getElementById("listar");
-const btnAgregar = document.getElementById("agregar");
+const btnAgregar = document.getElementById("agregar")
+const btnInsertar = document.getElementById("insertar");
 const btnEliminar = document.getElementById("eliminar");
 const btnInverso = document.getElementById("inverso");
 
@@ -132,20 +144,52 @@ btnListar.addEventListener("click",()=>{
 let list = "";
 list = inventario.listar()
 if(list === ""){
-    return lista.innerHTML = "0 registros al hilo";
+    return lista.innerHTML = "0 registros al hilo.";
 }
 lista.innerHTML = inventario.listar();
 })
+
+
+// btnAgregar.addEventListener("click",()=>{
+//     if(!codigo.value || !nombre.value || !cantidad.value || !precio.value){
+//         return lista.innerHTML = "Datos faltantes...";
+//     } else if(false == inventario.agregar(producto)){
+//         return lista.innerHTML = "Código en uso...";
+//     } else{
+//         producto = new Producto(Number(codigo.value),nombre.value,cantidad.value,precio.value)
+//         lista.innerHTML = inventario.listar();
+//     }
+// })
+
 btnAgregar.addEventListener("click",()=>{
-    if(!nombre.value || !precio.value || !cantidad.value || !codigo.value){
-        return lista.innerHTML = "Datos faltantes...";
+    if(!codigo.value || !nombre.value || !cantidad.value || !precio.value){
+        return lista.innerHTML = "Faltan datos";
+    } else{
+        var producto = new Producto(Number(codigo.value),nombre.value,cantidad.value,precio.value)
     }
-    producto = new Producto(codigo.value,nombre.value,cantidad.value,precio.value)
-    if(false == inventario.agregar(producto)){
-        return lista.innerHTML = "No se puede repetir el código";
+    if(inventario.agregar(producto) == false){
+        return lista.innerHTML = "Ya existe el codigo";
+    } else {
+        lista.innerHTML = inventario.listar();
     }
-    lista.innerHTML = inventario.listar();
 })
+
+
+btnInsertar.addEventListener("click",()=>{
+    if(!codigo.value || !nombre.value || !cantidad.value || !precio.value){
+        return lista.innerHTML = "Datos faltantes...";
+    }else if(!posicion.value){
+        return lista.innerHTML = "Posición requerida...";
+    } else {
+        producto = new Producto(Number(codigo.value),nombre.value,cantidad.value,precio.value)
+        inventario.insertar(Number(posicion.value), producto); 
+        lista.innerHTML = inventario.listar();
+    }
+})
+
+
+
+
 btnBuscar.addEventListener("click",()=>{
     if(!busqueda.value){
         return lista.innerHTML = "Falta el código para buscar"
